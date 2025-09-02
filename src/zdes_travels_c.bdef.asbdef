@@ -1,0 +1,29 @@
+projection;
+strict ( 2 );
+
+define behavior for ZDES_TRAVELS_C alias Travel
+{
+  use create;
+  use update;
+  use delete;
+
+  use association _booking { create; }
+}
+
+define behavior for ZDES_BOOKINGS_C alias Booking
+{
+  use update;
+  use delete;
+
+  use association _travel;
+  use association _booksuppl { create; }
+}
+
+define behavior for ZDES_BOOK_SUPPL_C alias Bookigsuppl
+{
+  use update;
+  use delete;
+
+  use association _Travel;
+  use association _Booking;
+}

@@ -1,0 +1,107 @@
+managed implementation in class zbp_des_travels_i unique;
+strict ( 2 );
+
+define behavior for ZDES_TRAVELS_I alias TRAVEL
+persistent table zdes_travels
+lock master
+//total etag LocalLastChangedAt
+authorization master ( global, instance )
+etag master LocalLastChangedAt
+{
+  create;
+  update;
+  delete;
+  field ( numbering : managed, readonly ) TravelUuid;
+  association _booking { create; }
+
+//    draft action Edit;
+//    draft action Discard;
+//    draft action Resume;
+//    draft action Activate optimized;
+//    draft determine action Prepare;
+
+
+  // cds entity ALIAS name LHS = Database level feild name RHS
+  mapping for zdes_travels
+    {
+      TravelUuid         = travel_uuid;
+      TravelId           = travel_id;
+      AgencyId           = agency_id;
+      CustomerId         = customer_id;
+      BeginDate          = begin_date;
+      EndDate            = end_date;
+      BookingFee         = booking_fee;
+      TotalPrice         = total_price;
+      CurrencyCode       = currency_code;
+      Description        = description;
+      OverallStatus      = overall_status;
+      LocalCreatedBy     = local_created_by;
+      LocalCreatedAt     = local_created_at;
+      LocalLastChangedBy = local_last_changed_by;
+      LocalLastChangedAt = local_last_changed_at;
+      LastChangedAt      = last_changed_at;
+    }
+}
+
+
+
+define behavior for ZDES_BOOKINGS_I alias Booking
+persistent table zdes_bookings
+lock dependent by _travel
+authorization dependent by _travel
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+  field ( readonly ) TravelUuid;
+  field ( numbering : managed, readonly ) BookingUuid;
+  association _travel;
+  association _booksuppl { create; }
+
+  // cds entity alias name lhs = database level feild name rhs
+  mapping for zdes_bookings
+    {
+      BookingUuid        = booking_uuid;
+      TravelUUID         = parent_uuid;
+      BookingId          = booking_id;
+      BookingDate        = booking_date;
+      CustomerId         = customer_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      FlightPrice        = flight_price;
+      CurrencyCode       = currency_code;
+      BookingStatus      = booking_status;
+      LocalLastChangedAt = local_last_changed_at;
+    }
+}
+
+
+
+define behavior for ZDES_BOOK_SUPPL_I alias Booksuppl
+persistent table zdes_book_suppl
+lock dependent by _Travel
+authorization dependent by _Travel
+etag master LocalLastChangedAt
+{
+  update;
+  delete;
+
+  field ( numbering : managed, readonly ) BooksupplUuid;
+  field ( readonly ) TravelUuid, BookingUUId;
+  association _Travel;
+  association _Booking;
+
+  // Cds entity alias name LHS = Database level field name RHS
+  mapping for zdes_book_suppl
+    {
+      BooksupplUuid       = booksuppl_uuid;
+      TravelUUID          = root_uuid;
+      BookingUUID         = parent_uuid;
+      BookingSupplementId = booking_supplement_id;
+      SupplementId        = supplement_id;
+      Price               = price;
+      CurrencyCode        = currency_code;
+      LocalLastChangedAt  = local_last_changed_at;
+    }
+}
